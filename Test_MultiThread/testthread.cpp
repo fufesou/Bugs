@@ -26,15 +26,18 @@ void CTestThread::run()
 void s_process()
 {
     int count = 0;
-    s_signal(SIGALRM, s_sig_alarm);
+    void (*prehandler)(int) = s_signal(SIGALRM, s_sig_alarm);
 
 doagain:
     alarm(5);
 
     if (sigsetjmp(s_jmpbuf, 1) != 0)
     {
+        qDebug() << "after siglongjmp " << count;
         if (count++ > 5)
         {
+            (void)s_signal(SIGALRM, prehandler);
+            qDebug() << "return";
             return;
         }
         else
@@ -49,7 +52,9 @@ doagain:
 static void s_sig_alarm(int signo)
 {
     (void)signo;
+    qDebug() << "in s_sig_alarm - before sigsetjmp";
     siglongjmp(s_jmpbuf, 1);
+    qDebug() << "in s_sig_alarm - after sigsetjmp";
 }
 
 static void (*s_signal(int signo, void (*sigfunc)(int)))(int)
