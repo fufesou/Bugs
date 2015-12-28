@@ -33,7 +33,7 @@ doagain:
 
     if (sigsetjmp(s_jmpbuf, 1) != 0)
     {
-        qDebug() << "after siglongjmp " << count;
+        qDebug() << "in s_process - after sigsetjmp " << count;
         if (count++ > 5)
         {
             (void)s_signal(SIGALRM, prehandler);
@@ -52,9 +52,9 @@ doagain:
 static void s_sig_alarm(int signo)
 {
     (void)signo;
-    qDebug() << "in s_sig_alarm - before sigsetjmp";
+    qDebug() << "in s_sig_alarm - before siglongjmp";
     siglongjmp(s_jmpbuf, 1);
-    qDebug() << "in s_sig_alarm - after sigsetjmp";
+    qDebug() << "in s_sig_alarm - after siglongjmp";
 }
 
 static void (*s_signal(int signo, void (*sigfunc)(int)))(int)
